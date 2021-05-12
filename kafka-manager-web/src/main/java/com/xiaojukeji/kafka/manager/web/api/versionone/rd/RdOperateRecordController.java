@@ -24,20 +24,19 @@ import java.util.List;
 @RestController
 @RequestMapping(ApiPrefix.API_V1_RD_PREFIX)
 public class RdOperateRecordController {
-
     private static final int MAX_RECORD_COUNT = 200;
 
     @Autowired
     private OperateRecordService operateRecordService;
 
     @ApiOperation(value = "查询操作记录", notes = "")
-    @RequestMapping(value = "operate-record", method = RequestMethod.POST)
+    @PostMapping(value = "operate-record")
     @ResponseBody
     public Result<List<OperateRecordVO>> geOperateRecords(@RequestBody OperateRecordDTO dto) {
         if (ValidateUtils.isNull(dto) || !dto.legal()) {
             return Result.buildFrom(ResultStatus.PARAM_ILLEGAL);
         }
-        List<OperateRecordVO> voList = OperateRecordModelConverter.convert2OperateRecordVOList(operateRecordService.queryByCondt(dto));
+        List<OperateRecordVO> voList = OperateRecordModelConverter.convert2OperateRecordVOList(operateRecordService.queryByCondition(dto));
         if (voList.size() > MAX_RECORD_COUNT) {
             voList = voList.subList(0, MAX_RECORD_COUNT);
         }

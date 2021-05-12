@@ -50,7 +50,10 @@ class CustomForm extends React.Component<IXFormProps> {
           notification.success({ message: '扩分成功' });
           this.props.form.resetFields();
           admin.getClusterTopics(this.props.clusterId);
-        });
+        }).catch(err => {
+          notification.error({ message: '扩分成功' });
+
+        })
       }
     });
   }
@@ -93,7 +96,7 @@ class CustomForm extends React.Component<IXFormProps> {
           {/* 运维管控-topic信息-扩分区操作 */}
           <Form.Item label="所属region" >
             {getFieldDecorator('regionNameList', {
-              initialValue: admin.topicsBasic ? admin.topicsBasic.regionNameList : '',
+              initialValue: admin.topicsBasic && admin.topicsBasic.regionNameList.length > 0 ? admin.topicsBasic.regionNameList.join(',') : ' ',
               rules: [{ required: true, message: '请输入所属region' }],
             })(<Input disabled={true} />)}
           </Form.Item>
@@ -108,11 +111,11 @@ class CustomForm extends React.Component<IXFormProps> {
             })(<Input placeholder="请输入分区数" />)}
           </Form.Item>
           <Form.Item label="类型">
-            {/* <Form.Item label={this.state.checked ? 'Region类型' : 'Borker类型'} > */}
+            {/* <Form.Item label={this.state.checked ? 'Region类型' : 'Broker类型'} > */}
             {/* <Switch onChange={(checked) => this.onSwitchChange(checked)} /> */}
             <Radio.Group value={this.state.checked ? 'region' : 'broker'} onChange={(e) => { this.onSwitchChange(e.target.value === 'region' ? true : false); }}>
               <Radio.Button value="region">Region类型</Radio.Button>
-              <Radio.Button value="broker">Borker类型</Radio.Button>
+              <Radio.Button value="broker">Broker类型</Radio.Button>
             </Radio.Group>
           </Form.Item>
           <Form.Item label="brokerIdList" style={{ display: this.state.checked ? 'none' : '' }}>

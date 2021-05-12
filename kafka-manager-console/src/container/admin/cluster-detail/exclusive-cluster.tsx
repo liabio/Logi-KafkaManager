@@ -159,7 +159,6 @@ export class ExclusiveCluster extends SearchAndFilterContainer {
 
   public handleDeleteRegion = (record: IBrokersRegions) => {
     const filterRegion = admin.logicalClusters.filter(item => item.regionIdList.includes(record.id));
-
     if (!filterRegion) {
       return;
     }
@@ -315,8 +314,7 @@ export class ExclusiveCluster extends SearchAndFilterContainer {
       >
         <div className="region-prompt">
           <span>
-            由于该Region已被逻辑集群【 {this.state.logicalClusterName} 】使用
-            请先解除Region与逻辑集群的关系
+            该Region已被逻辑集群【 {this.state.logicalClusterName} 】使用，请先解除Region与逻辑集群的关系
           </span>
         </div>
       </Modal>
@@ -335,6 +333,7 @@ export class ExclusiveCluster extends SearchAndFilterContainer {
           {this.renderSearch('', '请输入Region名称／broker ID')}
         </ul>
         {this.renderRegion()}
+        {this.renderDeleteRegionModal()}
       </div >
     );
   }

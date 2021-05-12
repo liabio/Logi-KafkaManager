@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { Modal, Table, Button, notification, message, Tooltip, Icon, Popconfirm, Alert } from 'component/antd';
+import { Modal, Table, Button, notification, message, Tooltip, Icon, Popconfirm, Alert, Popover } from 'component/antd';
 import { wrapper } from 'store';
 import { observer } from 'mobx-react';
 import { IXFormWrapper, IMetaData, IRegister } from 'types/base-type';
 import { admin } from 'store/admin';
+import { users } from 'store/users';
 import { registerCluster, createCluster, pauseMonitoring } from 'lib/api';
 import { SearchAndFilterContainer } from 'container/search-filter';
 import { cluster } from 'store/cluster';
@@ -12,6 +13,7 @@ import { urlPrefix } from 'constants/left-menu';
 import { indexUrl } from 'constants/strategy'
 import { region } from 'store';
 import './index.less';
+import Monacoeditor from 'component/editor/monacoEditor';
 import { getAdminClusterColumns } from '../config';
 
 const { confirm } = Modal;
@@ -58,7 +60,7 @@ export class ClusterList extends SearchAndFilterContainer {
             message: '请输入zookeeper地址',
           }],
           attrs: {
-            placeholder: '请输入zookeeper地址',
+            placeholder: '请输入zookeeper地址，例如：192.168.0.1:2181,192.168.0.2:2181/logi-kafka',
             rows: 2,
             disabled: item ? true : false,
           },
@@ -72,39 +74,39 @@ export class ClusterList extends SearchAndFilterContainer {
             message: '请输入bootstrapServers',
           }],
           attrs: {
-            placeholder: '请输入bootstrapServers',
+            placeholder: '请输入bootstrapServers，例如：192.168.1.1:9092,192.168.1.2:9092',
             rows: 2,
             disabled: item ? true : false,
           },
         },
-        {
-          key: 'idc',
-          label: '数据中心',
-          defaultValue: region.regionName,
-          rules: [{ required: true, message: '请输入数据中心' }],
-          attrs: {
-            placeholder: '请输入数据中心',
-            disabled: true,
-          },
-        },
-        {
-          key: 'mode',
-          label: '集群类型',
-          type: 'select',
-          options: cluster.clusterModes.map(ele => {
-            return {
-              label: ele.message,
-              value: ele.code,
-            };
-          }),
-          rules: [{
-            required: true,
-            message: '请选择集群类型',
-          }],
-          attrs: {
-            placeholder: '请选择集群类型',
-          },
-        },
+        // {
+        //   key: 'idc',
+        //   label: '数据中心',
+        //   defaultValue: region.regionName,
+        //   rules: [{ required: true, message: '请输入数据中心' }],
+        //   attrs: {
+        //     placeholder: '请输入数据中心',
+        //     disabled: true,
+        //   },
+        // },
+        // {
+        //   key: 'mode',
+        //   label: '集群类型',
+        //   type: 'select',
+        //   options: cluster.clusterModes.map(ele => {
+        //     return {
+        //       label: ele.message,
+        //       value: ele.code,
+        //     };
+        //   }),
+        //   rules: [{
+        //     required: true,
+        //     message: '请选择集群类型',
+        //   }],
+        //   attrs: {
+        //     placeholder: '请选择集群类型',
+        //   },
+        // },
         {
           key: 'kafkaVersion',
           label: 'kafka版本',
@@ -131,7 +133,26 @@ export class ClusterList extends SearchAndFilterContainer {
 { 
   "security.protocol": "SASL_PLAINTEXT", 
   "sasl.mechanism": "PLAIN", 
-  "sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"xxxxxx\" password=\"xxxxxx\";"
+  "sasl.jaas.config": "org.apache.kafka.common.security.plain.PlainLoginModule required username=\\"xxxxxx\\" password=\\"xxxxxx\\";"
+}`,
+            rows: 8,
+          },
+        },
+        {
+          key: 'jmxProperties',
+          label: 'JMX认证',
+          type: 'text_area',
+          rules: [{
+            required: false,
+            message: '请输入JMX认证',
+          }],
+          attrs: {
+            placeholder: `请输入JMX认证，例如：
+{
+"maxConn": 10, #KM对单台Broker的最大jmx连接数
+"username": "xxxxx", #用户名
+"password": "xxxxx", #密码
+"openSSL": true, #开启SSL，true表示开启SSL，false表示关闭
 }`,
             rows: 8,
           },
@@ -256,30 +277,41 @@ export class ClusterList extends SearchAndFilterContainer {
 
   public getColumns = () => {
     const cols = getAdminClusterColumns();
+    const role = users.currentUser.role;
     const col = {
       title: '操作',
       render: (value: string, item: IMetaData) => (
         <>
-          <a
-            onClick={this.createOrRegisterCluster.bind(this, item)}
-            className="action-button"
-          >编辑
-          </a>
-          <Popconfirm
-            title={`确定${item.status === 1 ? '暂停' : '开始'}${item.clusterName}监控？`}
-            onConfirm={() => this.pauseMonitor(item)}
-            cancelText="取消"
-            okText="确认"
-          >
-            <a
-              className="action-button"
-            >
-              {item.status === 1 ? '暂停监控' : '开始监控'}
-            </a>
-          </Popconfirm>
-          <a onClick={this.showMonitor.bind(this, item)}>
-            删除
-          </a>
+          {
+            role && role === 2 ? <>
+              <a
+                onClick={this.createOrRegisterCluster.bind(this, item)}
+                className="action-button"
+              >编辑
+              </a>
+              <Popconfirm
+                title={`确定${item.status === 1 ? '暂停' : '开始'}${item.clusterName}监控？`}
+                onConfirm={() => this.pauseMonitor(item)}
+                cancelText="取消"
+                okText="确认"
+              >
+                <Tooltip placement="left" title="暂停监控将无法正常监控指标信息，建议开启监控">
+                  <a
+                    className="action-button"
+                  >
+                    {item.status === 1 ? '暂停监控' : '开始监控'}
+                  </a>
+                </Tooltip>
+              </Popconfirm>
+              <a onClick={this.showMonitor.bind(this, item)}>
+                删除
+              </a>
+            </> : <Tooltip placement="left" title="该功能只对运维人员开放">
+                <a style={{ color: '#a0a0a0' }} className="action-button">编辑</a>
+                <a className="action-button" style={{ color: '#a0a0a0' }}>{item.status === 1 ? '暂停监控' : '开始监控'}</a>
+                <a style={{ color: '#a0a0a0' }}>删除</a>
+              </Tooltip>
+          }
         </>
       ),
     };
@@ -288,6 +320,7 @@ export class ClusterList extends SearchAndFilterContainer {
   }
 
   public renderClusterList() {
+    const role = users.currentUser.role;
     return (
       <>
         <div className="container">
@@ -296,7 +329,14 @@ export class ClusterList extends SearchAndFilterContainer {
               {this.renderSearch('', '请输入集群名称')}
               <li className="right-btn-1">
                 <a style={{ display: 'inline-block', marginRight: '20px' }} href={indexUrl.cagUrl} target="_blank">集群接入指南</a>
-                <Button type="primary" onClick={this.createOrRegisterCluster.bind(this, null)}>接入集群</Button>
+                {
+                  role && role === 2 ?
+                    <Button type="primary" onClick={this.createOrRegisterCluster.bind(this, null)}>接入集群</Button>
+                    :
+                    <Tooltip placement="left" title="该功能只对运维人员开放" trigger='hover'>
+                      <Button disabled type="primary">接入集群</Button>
+                    </Tooltip>
+                }
               </li>
             </ul>
           </div>

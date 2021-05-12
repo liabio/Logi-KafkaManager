@@ -13,14 +13,11 @@ public class ConfigUtils {
     @Value(value = "${custom.idc}")
     private String idc;
 
-    @Value("${custom.jmx.max-conn}")
-    private Integer jmxMaxConn;
-
     @Value(value = "${spring.profiles.active}")
     private String kafkaManagerEnv;
 
     @Value(value = "${custom.store-metrics-task.save-days}")
-    private Integer maxMetricsSaveDays;
+    private Long maxMetricsSaveDays;
 
     public String getIdc() {
         return idc;
@@ -28,14 +25,6 @@ public class ConfigUtils {
 
     public void setIdc(String idc) {
         this.idc = idc;
-    }
-
-    public Integer getJmxMaxConn() {
-        return jmxMaxConn;
-    }
-
-    public void setJmxMaxConn(Integer jmxMaxConn) {
-        this.jmxMaxConn = jmxMaxConn;
     }
 
     public String getKafkaManagerEnv() {
@@ -46,11 +35,11 @@ public class ConfigUtils {
         this.kafkaManagerEnv = kafkaManagerEnv;
     }
 
-    public Integer getMaxMetricsSaveDays() {
+    public Long getMaxMetricsSaveDays() {
         return maxMetricsSaveDays;
     }
 
-    public void setMaxMetricsSaveDays(Integer maxMetricsSaveDays) {
+    public void setMaxMetricsSaveDays(Long maxMetricsSaveDays) {
         this.maxMetricsSaveDays = maxMetricsSaveDays;
     }
 }
