@@ -25,6 +25,7 @@ public class FlushClusterMetadata {
 
     @Scheduled(cron="0/30 * * * * ?")
     public void flush() {
+        //从数据库查集群
        List<ClusterDO> doList = clusterService.list();
 
        Set<Long> newClusterIdSet = new HashSet<>();

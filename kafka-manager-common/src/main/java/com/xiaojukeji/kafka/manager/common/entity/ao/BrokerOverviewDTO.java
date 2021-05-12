@@ -156,6 +156,7 @@ public class BrokerOverviewDTO {
         brokerOverviewDTO.setBrokerId(brokerMetadata.getBrokerId());
         brokerOverviewDTO.setHost(brokerMetadata.getHost());
         brokerOverviewDTO.setPort(brokerMetadata.getPort());
+        //设置jmxPort为实际的端口
         brokerOverviewDTO.setJmxPort(brokerMetadata.getJmxPort());
         brokerOverviewDTO.setStartTime(brokerMetadata.getTimestamp());
         brokerOverviewDTO.setStatus(0);

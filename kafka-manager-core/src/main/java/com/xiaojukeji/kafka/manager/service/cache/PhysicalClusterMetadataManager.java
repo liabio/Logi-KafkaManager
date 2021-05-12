@@ -278,7 +278,7 @@ public class PhysicalClusterMetadataManager {
             return;
         }
         metadataMap.put(brokerId, brokerMetadata);
-
+        //设置jmx信息
         Map<Integer, JmxConnectorWrap> jmxMap = JMX_CONNECTOR_MAP.getOrDefault(clusterId, new ConcurrentHashMap<>());
         jmxMap.put(brokerId, new JmxConnectorWrap(brokerMetadata.getHost(), brokerMetadata.getJmxPort(), jmxMaxConn));
         JMX_CONNECTOR_MAP.put(clusterId, jmxMap);

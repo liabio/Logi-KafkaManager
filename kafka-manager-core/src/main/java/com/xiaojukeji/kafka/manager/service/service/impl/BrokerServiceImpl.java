@@ -154,6 +154,7 @@ public class BrokerServiceImpl implements BrokerService {
                         brokerId);
                 continue;
             }
+            //根据brokerMetadata设置BrokerOverviewDTO,包括jmxPort等
             overviewDTOMap.put(brokerId, BrokerOverviewDTO.newInstance(
                     brokerMetadata,
                     brokerMap.get(brokerId),
@@ -177,6 +178,7 @@ public class BrokerServiceImpl implements BrokerService {
             brokerOverviewDTO.setBrokerId(brokerDO.getBrokerId());
             brokerOverviewDTO.setHost(brokerDO.getHost());
             brokerOverviewDTO.setPort(brokerDO.getPort());
+            //塞jmxPort为-1
             brokerOverviewDTO.setJmxPort(DBStatusEnum.DEAD.getStatus());
             brokerOverviewDTO.setStartTime(brokerDO.getTimestamp());
             brokerOverviewDTO.setStatus(DBStatusEnum.DEAD.getStatus());
